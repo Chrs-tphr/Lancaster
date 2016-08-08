@@ -639,8 +639,8 @@ function externalLP_CA_AT(licNum,rlpType,doPopulateRef,doPopulateTrx,itemCap)
 		}
 		else if (errorNode)
 		{
-			logDebug("Error for license " + licNum + " : " + errorNode.getText().replace(/\+/g," "));
-			returnMessage+="License " + licNum +  " : " + errorNode.getText().replace(/\+/g," ") + " ";
+			logDebug("Error for license " + licNum + " : " + String(errorNode.getText()).replace(/\+/g," "));
+			returnMessage+="License " + licNum +  " : " + String(errorNode.getText()).replace(/\+/g," ") + " ";
 			continue;
 		}
 
@@ -1116,4 +1116,101 @@ function updateFeeFromASI(ASIField, FeeCode) {
 			voidRemoveFees(FeeCode)
 		}
 	}
+}
+
+function relayPaymentReceiveAfter() {
+    aa.print("Enter relayPaymentReceiveAfter()");    
+    aa.print("");
+
+    //BUSA16-00017
+    //DUB16-00000-0002O
+    //Licenses/Business/General/Application
+    //aa.fee.isFullPaid4Renewal(capID)
+    
+    aa.print("Begin Globals");
+    for (variableIndex in this) {
+        var variable = this[variableIndex];
+        if (typeof variable != "function") {
+            aa.print(variableIndex + ":" + variable)
+        }
+    }
+    aa.print("End Globals");
+    aa.print("");
+
+    //Echo the environment variables
+    aa.print("Begin Environment Variables");
+    var paramValues = aa.env.getParamValues();
+    var keys = paramValues.keys();
+    while (keys.hasNext()) {
+        var key = keys.next();
+        var value = paramValues.get(key);
+        aa.print(key + ":" + value);
+    }
+    aa.print("End Environment Variables");
+    aa.print("");
+
+    var capId = getCapId();
+    aa.print("capId: " + capId);
+
+    //Construct the transaction model that we'll be sending ot the REST endpoint
+    var transactionModel = {
+        "capId": capId,
+        "eventDate" : aa.util.now()
+    };
+
+    //Add the environment variables
+    keys = paramValues.keys();
+    while (keys.hasNext()) {
+        var key = keys.next();        
+        var value = paramValues.get(key);
+        transactionModel[key] = value;        
+    }
+
+    //Get the fee schedule
+    var getFeeScheduleByCapIDScriptResult = aa.finance.getFeeScheduleByCapID(capId);
+    if (getFeeScheduleByCapIDScriptResult.getSuccess()) {
+        transactionModel.feeSchedule = getFeeScheduleByCapIDScriptResult.getOutput();
+    } else {
+        aa.print(getFeeScheduleByCapIDScriptResult.getErrorMessage());
+    }
+
+    //Get the payment items
+    var getPaymentByCapIDScriptResult = aa.finance.getPaymentByCapID(capId, null);
+    if (getPaymentByCapIDScriptResult.getSuccess()) {
+        transactionModel.paymentItems = getPaymentByCapIDScriptResult.getOutput();
+    } else {
+        aa.print(getPaymentByCapIDScriptResult.getErrorMessage());
+    }
+
+    //Get the payment fee items
+    var getPaymentFeeItemsScriptResult = aa.finance.getPaymentFeeItems(capId, null);
+    if (getPaymentFeeItemsScriptResult.getSuccess()) {
+        transactionModel.paymentFeeItems = [];
+        var paymentFeeItems = getPaymentFeeItemsScriptResult.getOutput();
+        for (paymentFeeItemIndex in paymentFeeItems) {
+            var paymentFeeItem = paymentFeeItems[paymentFeeItemIndex];            
+            transactionModel.paymentFeeItems.push(paymentFeeItem);            
+        }
+    } else {
+        aa.print(getPaymentFeeItemsScriptResult.getErrorMessage());
+    }
+
+    //Get the fee items
+    var getFeeItemByCapIDScriptResult = aa.finance.getFeeItemByCapID(capId);
+    if (getFeeItemByCapIDScriptResult.getSuccess()) {
+        transactionModel.feeItems = getFeeItemByCapIDScriptResult.getOutput();
+    } else {
+        aa.print(getFeeItemByCapIDScriptResult.getErrorMessage());
+    }
+
+    //Create an instance of the ObjectMapper that we'll be using for serialization
+    var objectMapper = new org.codehaus.jackson.map.ObjectMapper();   
+
+    aa.print("transactionModel: " + objectMapper.writeValueAsString(transactionModel));
+
+    aa.env.setValue("ScriptReturnCode", "0");
+    aa.env.setValue("ScriptReturnMessage", "relayPaymentReceiveAfter()");
+
+    aa.print("");
+    aa.print("Exit relayPaymentReceiveAfter()");
 }

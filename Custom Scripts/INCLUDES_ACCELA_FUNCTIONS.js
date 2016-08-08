@@ -5060,8 +5060,8 @@ function externalLP_CA(licNum,rlpType,doPopulateRef,doPopulateTrx,itemCap)
 		var errorNode = root.getChild("Error");
 		if (errorNode)
 			{
-			logDebug("Error for license " + licNum + " : " + errorNode.getText().replace(/\+/g," "));
-			returnMessage+="License " + licNum +  " : " + errorNode.getText().replace(/\+/g," ") + " ";
+			logDebug("Error for license " + licNum + " : " + String(errorNode.getText()).replace(/\+/g," "));
+			returnMessage+="License " + licNum +  " : " + String(errorNode.getText()).replace(/\+/g," ") + " ";
 			continue;
 			}
 
