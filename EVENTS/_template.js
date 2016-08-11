@@ -3,11 +3,12 @@
 ===================================================================*/
 
 /*===================================================================
-//ID: 
-//Name: 
-//Developer: 
-//Developer Agency: 
-//Script Description: 
+// ID: 
+// Name: 
+// Developer: 
+// Developer Agency: 
+// Script Description: 
+// Status: 
 
 000 - 
 
