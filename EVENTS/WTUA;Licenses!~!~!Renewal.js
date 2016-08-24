@@ -11,6 +11,6 @@
 // Status: Active
 // Notes: 8/23/2016 - Added additional task and status (Renewal Intake, Fees Paid)
 
-010 - (matches(wfTask, "License Issuance", "Renewal Intake") && matches(wfTask, "Renewed", "Fees Paid") (balanceDue > 0 || feeTotalByStatus("NEW") > 0)) ^ showMessage = true; comment("The record has an outstanding balance which must be paid before it can be issued or fees that have not been invoiced."); cancel = true;
+010 - (matches(wfTask, "License Issuance", "Renewal Intake") && matches(wfTask, "Renewed", "Fees Paid") && (balanceDue > 0 || feeTotalByStatus("NEW") > 0)) ^ showMessage = true; comment("The record has an outstanding balance which must be paid before it can be issued or fees that have not been invoiced."); cancel = true;
 
 ===================================================================*/
