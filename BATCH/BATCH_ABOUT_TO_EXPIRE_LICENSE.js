@@ -82,7 +82,7 @@ if (batchJobResult.getSuccess()) {
 | Start: BATCH PARAMETERS
 |
 /------------------------------------------------------------------------------------------------------*/
-var fromDate = getParam("fromDate"); // Hardcoded dates.   Use for testing only
+var fromDate = getParam("fromDate"); // Hardcoded dates. Use for testing only
 var toDate = getParam("toDate"); // ""
 var dFromDate = aa.date.parseDate(fromDate); //
 var dToDate = aa.date.parseDate(toDate); //
