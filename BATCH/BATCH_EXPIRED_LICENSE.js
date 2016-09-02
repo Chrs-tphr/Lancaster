@@ -115,11 +115,12 @@ var feePeriod = getParam("feePeriod"); // fee period to use {LICENSE}
 /------------------------------------------------------------------------------------------------------*/
 var startDate = new Date();
 
-if (!fromDate.length) { // no "from" date, assume today + number of days to look ahead
-	fromDate = dateAdd(null, parseInt(lookAheadDays))
+if (!fromDate.length) { // no "from" date, assume today 
+	fromDate = dateAdd(null, 0);//fromDate = dateAdd(null, parseInt(lookAheadDays))
 }
-if (!toDate.length) { // no "to" date, assume today + number of look ahead days + span
-	toDate = dateAdd(null, parseInt(lookAheadDays) + parseInt(daySpan))
+if (!toDate.length) { // no "to" date, assume today 
+	toDate = fromDate;
+	//toDate = dateAdd(null, parseInt(lookAheadDays) + parseInt(daySpan))
 }
 var mailFrom = lookup("ACA_EMAIL_TO_AND_FROM_SETTING", "RENEW_LICENSE_AUTO_ISSUANCE_MAILFROM");
 var acaSite = lookup("ACA_CONFIGS", "ACA_SITE");
@@ -351,8 +352,10 @@ function mainProcess() {
 
 		// lock Parent License
 
-		if (lockParentLicense != "") {
+		if (lockParentLicense && lockParentLicense.substring(0, 1).toUpperCase().equals("Y")) {
 			licCap = getLicenseCapId("*/*/*/*");
+//			if (lockParentLicense != "") {
+//				licCap = getLicenseCapId("*/*/*/*");
 
 			if (licCap) {
 				logDebug(licCap + ": adding Lock : " + lockParentLicense);
