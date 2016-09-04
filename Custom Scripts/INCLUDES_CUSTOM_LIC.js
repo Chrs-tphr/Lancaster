@@ -59,7 +59,7 @@ function calculateLicAppPenaltyFee(){
 	}else{
 		appFee = feeAmount("LIC_020");
 		pAmount = appFee*penaltyPercent;
-		updateFee("LIC_050","LIC_BUSINESS_GENERAL","FINAL","pAmount","Y");//LIC_050 needs to be configured
+		updateFee("LIC_050","LIC_BUSINESS_GENERAL","FINAL","pAmount","Y");//LIC_050 is configured, need to confirm configuration with client.
 	}
 }
 
