@@ -13,7 +13,7 @@
 
 
 function monthsLate(){
-//	var boDate = new Date("01/01/2016");
+//	var oDate = new Date("01/01/2016");
 //	var fDate =  new Date("12/01/2016");
 
 	var oDate = convertDate(AInfo["Business Open Date"]); logDebug("oDate: "+oDate);
