@@ -125,3 +125,32 @@ function calculateLicRenewalPenaltyFee(){
 	}
 }
 
+function updateLicense(){
+	try {
+		// get license capId
+		var licId = getParentLicenseCapID(capId);
+		
+		if (licId != null) {
+			// get license
+			var thisLic = new licenseObject(licIdString,licId); 
+			
+			// update expiration date
+			var prevExp = thisLic.getExpiration();	
+			thisLic.setExpiration(dateAddMonths(prevExp,12)) ;
+			
+			// update license record status to 'Issued'
+			updateAppStatus("Issued", "updated by script", licId);
+			
+			// update expiration status to 'Active'
+			thisLic.setStatus("Active");
+			
+			// update custom lists
+			copyASITables(capId, licId);
+		} else {
+			logDebug("Error: unable to get parent license record to update");
+		}
+	}
+	catch (err){
+		logDebug("Javascript error: " + err.message);
+	}
+}
