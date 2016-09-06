@@ -107,7 +107,7 @@ var deactivateLicense = getParam("deactivateLicense"); // deactivate the LP
 var lockParentLicense = getParam("lockParentLicense"); // add this lock on the parent license
 var createRenewalRecord = getParam("createTempRenewalRecord"); // create a temporary record
 var feeSched = getParam("feeSched"); //
-var feeList = getParam("feeList"); // comma delimted list of fees to add
+var feeList = getParam("feeList"); // comma delimited list of fees to add
 var feePeriod = getParam("feePeriod"); // fee period to use {LICENSE}
 /*----------------------------------------------------------------------------------------------------/
 |
