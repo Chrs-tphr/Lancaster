@@ -1,5 +1,5 @@
 // testing parameters, uncomment to use in script test
-///*
+/*
 aa.env.setValue("showDebug","Y");
 aa.env.setValue("fromDate","01/01/2000");
 aa.env.setValue("toDate","12/31/2014");
@@ -23,7 +23,7 @@ aa.env.setValue("createTempRenewalRecord","");
 aa.env.setValue("feeSched","");
 aa.env.setValue("feeList","");
 aa.env.setValue("feePeriod","");
-//*/
+*/
 /*------------------------------------------------------------------------------------------------------/
 | Program: BATCH_ABOUT_TO_EXPIRE_LICENSE.js  Trigger: Batch
 | Client:
