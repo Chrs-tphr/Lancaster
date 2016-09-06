@@ -1,5 +1,5 @@
 // testing parameters, uncomment to use in script test
-///*
+/*
 aa.env.setValue("showDebug","Y");
 aa.env.setValue("fromDate","01/01/2000");
 aa.env.setValue("toDate","12/31/2014");
@@ -7,7 +7,7 @@ aa.env.setValue("appGroup","Licenses");
 aa.env.setValue("appTypeType","*");
 aa.env.setValue("appSubtype","*");
 aa.env.setValue("appCategory","*");
-aa.env.setValue("expirationStatus","Active");
+aa.env.setValue("expirationStatus","About to Expire");
 aa.env.setValue("newExpirationStatus","Expired");
 aa.env.setValue("newApplicationStatus","Expired");
 aa.env.setValue("gracePeriodDays","0");
@@ -23,7 +23,7 @@ aa.env.setValue("createTempRenewalRecord","");
 aa.env.setValue("feeSched","");
 aa.env.setValue("feeList","");
 aa.env.setValue("feePeriod","");
-//*/
+*/
 /*------------------------------------------------------------------------------------------------------/
 | Program: License Expirations.js  Trigger: Batch
 | Client:
@@ -48,6 +48,7 @@ SCRIPT_VERSION = 2.0;
 eval(getScriptText("INCLUDES_ACCELA_FUNCTIONS"));
 eval(getScriptText("INCLUDES_BATCH"));
 eval(getScriptText("INCLUDES_CUSTOM"));
+eval(getScriptText("INCLUDES_CUSTOM_LIC"));
 
 function getScriptText(vScriptName) {
 	vScriptName = vScriptName.toUpperCase();
@@ -116,11 +117,12 @@ var feePeriod = getParam("feePeriod"); // fee period to use {LICENSE}
 var startDate = new Date();
 
 if (!fromDate.length) { // no "from" date, assume today 
-	fromDate = dateAdd(null, 0);//fromDate = dateAdd(null, parseInt(lookAheadDays))
+	//fromDate = dateAdd(null, 0);
+	fromDate = dateAdd(null, parseInt(lookAheadDays))
 }
 if (!toDate.length) { // no "to" date, assume today 
-	toDate = fromDate;
-	//toDate = dateAdd(null, parseInt(lookAheadDays) + parseInt(daySpan))
+	//toDate = fromDate;
+	toDate = dateAdd(null, parseInt(lookAheadDays) + parseInt(daySpan))
 }
 var mailFrom = lookup("ACA_EMAIL_TO_AND_FROM_SETTING", "RENEW_LICENSE_AUTO_ISSUANCE_MAILFROM");
 var acaSite = lookup("ACA_CONFIGS", "ACA_SITE");
