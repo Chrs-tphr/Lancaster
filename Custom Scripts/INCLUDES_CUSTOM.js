@@ -1088,10 +1088,12 @@ function voidRemoveFees(vFeeCode)
 
 function removeZeroFees() {
 	var feeArr = loadFees();
-	for (x in feeArr) {
-		thisFee = feeArr[x];
-		if (thisFee.status == "NEW" && thisFee.amount == 0) {
-			voidRemoveFees(thisFee.code)//, "FINAL");
+	if(feeArr.length > 0){
+		for (x in feeArr) {
+			thisFee = feeArr[x];
+			if (thisFee.status == "NEW" && thisFee.amount == 0) {
+				voidRemoveFees(thisFee.code)//, "FINAL");
+			}
 		}
 	}
 }
