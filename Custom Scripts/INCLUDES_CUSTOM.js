@@ -9,7 +9,11 @@
 |
 |         : createRefContactsFromCapContactsAndLink - testing new ability to link public users to new ref contacts
 /------------------------------------------------------------------------------------------------------*/
-//eval( aa.proxyInvoker.newInstance("com.accela.aa.emse.emse.EMSEBusiness").getOutput().getMasterScript(aa.getServiceProviderCode(),"INCLUDES_CUSTOM","ADMIN").getScriptText() + "");
+
+//eval( aa.proxyInvoker.newInstance("com.accela.aa.emse.emse.EMSEBusiness").getOutput().getScriptByPK(aa.getServiceProviderCode(),"INCLUDES_CUSTOM_LIC","ADMIN").getScriptText() + "");
+
+//logDebug("----- Loading INCLUDES_CUSTOM");
+
 
 function createRefLicProf(rlpId,rlpType,pContactType)
 	{
@@ -1124,10 +1128,14 @@ function relayPaymentReceiveAfter() {
     aa.print("Enter relayPaymentReceiveAfter()");    
     aa.print("");
 
-    //BUSA16-00017
-    //DUB16-00000-0002O
-    //Licenses/Business/General/Application
-    //aa.fee.isFullPaid4Renewal(capID)
+    var url = "http://216.64.186.250/lancaster.cayenta.web/api/paymentreceive";
+    aa.print("url: " + url);
+
+    var login = "login";
+    aa.print("login: " + login);
+
+    var password = "password";
+    aa.print("password: " + password);    
     
     aa.print("Begin Globals");
     for (variableIndex in this) {
@@ -1154,61 +1162,120 @@ function relayPaymentReceiveAfter() {
     var capId = getCapId();
     aa.print("capId: " + capId);
 
-    //Construct the transaction model that we'll be sending ot the REST endpoint
-    var transactionModel = {
-        "capId": capId,
-        "eventDate" : aa.util.now()
-    };
+    try{
 
-    //Add the environment variables
-    keys = paramValues.keys();
-    while (keys.hasNext()) {
-        var key = keys.next();        
-        var value = paramValues.get(key);
-        transactionModel[key] = value;        
-    }
+        //Construct the transaction model that we'll be sending ot the REST endpoint
+        var transactionModel = {
+            "capId": capId,
+            "eventDate": aa.util.now(),
+            "appTypeArray": appTypeArray
+        };
 
-    //Get the fee schedule
-    var getFeeScheduleByCapIDScriptResult = aa.finance.getFeeScheduleByCapID(capId);
-    if (getFeeScheduleByCapIDScriptResult.getSuccess()) {
-        transactionModel.feeSchedule = getFeeScheduleByCapIDScriptResult.getOutput();
-    } else {
-        aa.print(getFeeScheduleByCapIDScriptResult.getErrorMessage());
-    }
-
-    //Get the payment items
-    var getPaymentByCapIDScriptResult = aa.finance.getPaymentByCapID(capId, null);
-    if (getPaymentByCapIDScriptResult.getSuccess()) {
-        transactionModel.paymentItems = getPaymentByCapIDScriptResult.getOutput();
-    } else {
-        aa.print(getPaymentByCapIDScriptResult.getErrorMessage());
-    }
-
-    //Get the payment fee items
-    var getPaymentFeeItemsScriptResult = aa.finance.getPaymentFeeItems(capId, null);
-    if (getPaymentFeeItemsScriptResult.getSuccess()) {
-        transactionModel.paymentFeeItems = [];
-        var paymentFeeItems = getPaymentFeeItemsScriptResult.getOutput();
-        for (paymentFeeItemIndex in paymentFeeItems) {
-            var paymentFeeItem = paymentFeeItems[paymentFeeItemIndex];            
-            transactionModel.paymentFeeItems.push(paymentFeeItem);            
+        //Add the environment variables
+        keys = paramValues.keys();
+        while (keys.hasNext()) {
+            var key = keys.next();        
+            var value = paramValues.get(key);
+            transactionModel[key] = value;        
         }
-    } else {
-        aa.print(getPaymentFeeItemsScriptResult.getErrorMessage());
+
+        //Get the fee schedule
+        var getFeeScheduleByCapIDScriptResult = aa.finance.getFeeScheduleByCapID(capId);
+        if (getFeeScheduleByCapIDScriptResult.getSuccess()) {
+            transactionModel.feeSchedule = getFeeScheduleByCapIDScriptResult.getOutput();
+        } else {
+            aa.print(getFeeScheduleByCapIDScriptResult.getErrorMessage());
+        }
+
+        //Get the payment items
+        var getPaymentByCapIDScriptResult = aa.finance.getPaymentByCapID(capId, null);
+        if (getPaymentByCapIDScriptResult.getSuccess()) {
+            transactionModel.paymentItems = getPaymentByCapIDScriptResult.getOutput();
+        } else {
+            aa.print(getPaymentByCapIDScriptResult.getErrorMessage());
+        }
+
+        //Get the payment fee items
+        var getPaymentFeeItemsScriptResult = aa.finance.getPaymentFeeItems(capId, null);
+        if (getPaymentFeeItemsScriptResult.getSuccess()) {
+            transactionModel.paymentFeeItems = [];
+            var paymentFeeItems = getPaymentFeeItemsScriptResult.getOutput();
+            for (paymentFeeItemIndex in paymentFeeItems) {
+                var paymentFeeItem = paymentFeeItems[paymentFeeItemIndex];            
+                transactionModel.paymentFeeItems.push(paymentFeeItem);            
+            }
+        } else {
+            aa.print(getPaymentFeeItemsScriptResult.getErrorMessage());
+        }
+
+        //Get the fee items
+        var getFeeItemByCapIDScriptResult = aa.finance.getFeeItemByCapID(capId);
+        if (getFeeItemByCapIDScriptResult.getSuccess()) {
+            transactionModel.feeItems = getFeeItemByCapIDScriptResult.getOutput();
+        } else {
+            aa.print(getFeeItemByCapIDScriptResult.getErrorMessage());
+        }
+
+        ////Get the applicant
+        //var getCapScriptResult = aa.cap.getCap(capId);
+        //if (getCapScriptResult.getSuccess()) {
+
+        //    var capScriptModel = getCapScriptResult.getOutput();
+        //    //logDebug("capScriptModel: " + capScriptModel);
+
+        //    var capModel = capScriptModel.getCapModel();
+        //    //logDebug("capModel: " + capModel);
+
+        //    //Get the applicant
+        //    var applicant = capModel.getApplicantModel();
+        //    //logDebug("applicant: " + applicant);
+
+        //    transactionModel.applicant = applicant;
+        //} else {
+        //    aa.print(getCapScriptResult.getErrorMessage());
+        //}
+
+        //Get the contacts
+        var getCapContactByCapIDScriptResult = aa.people.getCapContactByCapID(capId);
+        if(getCapContactByCapIDScriptResult.getSuccess()){
+            transactionModel.contacts = getCapContactByCapIDScriptResult.getOutput();        
+        }else{
+            aa.print(getOwnerByCapIdScriptResult.getErrorMessage());
+        }
+
+        //Get the owners
+        var getOwnerByCapIdScriptResult = aa.owner.getOwnerByCapId(capId);
+        if (getOwnerByCapIdScriptResult.getSuccess()) {
+            transactionModel.owners = getOwnerByCapIdScriptResult.getOutput();
+        } else {
+            aa.print(getOwnerByCapIdScriptResult.getErrorMessage());
+        }
+
+        //Create an instance of the ObjectMapper that we'll be using for serialization
+        var objectMapper = new org.codehaus.jackson.map.ObjectMapper();   
+
+        var transactionModelString = objectMapper.writeValueAsString(transactionModel);
+        aa.print("transactionModelString: " + transactionModelString);
+
+        doHttpPostRequest(login, password, url, transactionModelString, "application/json")
+
+    } catch (exception) {
+
+        var subject = "relayPaymentReceiveAfter custom script function processing error alert";
+        var message = "";
+
+        try { message += "Exception caught in relayPaymentReceiveAfter custom script function\n" } catch (_exception) { }
+        try { message += "exception: " + exception + "\n"; } catch (_exception) { }
+        try { message += "exception.fileName: " + exception.fileName + "\n"; } catch (_exception) { }
+        try { message += "exception.lineNumber: " + exception.lineNumber + "\n"; } catch (_exception) { }
+        try { message += "exception.message: " + exception.message + "\n"; } catch (_exception) { }
+        try { message += "exception.name: " + exception.name + "\n"; } catch (_exception) { }
+        try { message += "exception.rhinoException: " + exception.rhinoException + "\n"; } catch (_exception) { }
+        try { message += "exception.stack: " + exception.stack + "\n"; } catch (_exception) { }
+        try { message += "\n" + objectMapper.writeValueAsString(exception)  + "\n"; } catch(_exception) { }
+
+        aa.print(message);
     }
-
-    //Get the fee items
-    var getFeeItemByCapIDScriptResult = aa.finance.getFeeItemByCapID(capId);
-    if (getFeeItemByCapIDScriptResult.getSuccess()) {
-        transactionModel.feeItems = getFeeItemByCapIDScriptResult.getOutput();
-    } else {
-        aa.print(getFeeItemByCapIDScriptResult.getErrorMessage());
-    }
-
-    //Create an instance of the ObjectMapper that we'll be using for serialization
-    var objectMapper = new org.codehaus.jackson.map.ObjectMapper();   
-
-    aa.print("transactionModel: " + objectMapper.writeValueAsString(transactionModel));
 
     aa.env.setValue("ScriptReturnCode", "0");
     aa.env.setValue("ScriptReturnMessage", "relayPaymentReceiveAfter()");
@@ -1217,18 +1284,214 @@ function relayPaymentReceiveAfter() {
     aa.print("Exit relayPaymentReceiveAfter()");
 }
 
+function doHttpPostRequest(username, password, url, body, contentType) {
+    aa.print("Enter doHttpPostRequest()");
+
+    aa.print("username: " + username);
+    aa.print("password: " + password);
+    aa.print("url: " + url);
+    aa.print("body: " + body);
+    aa.print("contentType: " + contentType);
+
+    var post = new org.apache.commons.httpclient.methods.PostMethod(url);
+    var client = new org.apache.commons.httpclient.HttpClient();
+
+    // ---- Authentication ---- //
+    if(username !== null && password !== null){
+        var creds = new org.apache.commons.httpclient.UsernamePasswordCredentials(username, password);
+        client.getParams().setAuthenticationPreemptive(true);
+        client.getState().setCredentials(org.apache.commons.httpclient.auth.AuthScope.ANY, creds);
+    }
+    // -------------------------- //
+
+    post.setRequestHeader("Content-type", contentType);
+    
+    post.setRequestEntity(
+        new org.apache.commons.httpclient.methods.StringRequestEntity(body, contentType, "UTF-8")
+    );
+
+    var status = client.executeMethod(post);
+
+    if(status >= 400){
+        throw "HTTP Error: " + status;
+    }
+    
+    var br = new java.io.BufferedReader(new java.io.InputStreamReader(post.getResponseBodyAsStream()));
+    var response = "";
+    var line = br.readLine();
+    while(line != null){
+        response = response + line;
+        line = br.readLine();
+    }
+
+    post.releaseConnection();
+
+    aa.print(status);
+    aa.print(response);
+
+    aa.print("Exit doHttpPostRequest()");
+    return response;
+}
+
+// Custom License Scripts
 
 
+function calcMonthsLate(date1){//date1 is the ASI Business Open Date (Application) or License Expiration Date (Renewal) passed by calculateLicAppRenewPenaltyFee
+//	var fDate = new Date("12/01/2016");//testing
 
+	var fDate = convertDate(fileDate); logDebug("fDate: "+fDate);
+	var monthLate = 0;
+	var yMonthLate = 0;
+	var monthsLate = 0;
+	
+	if(date1 < fDate){
+		
+		var oMonth = date1.getMonth();
+		var oYear = date1.getFullYear();
+			logDebug("oMonth: "+oMonth+" oYear: "+oYear);
+		
+		var fDateMonth = fDate.getMonth();
+		var fDateYear = fDate.getFullYear();
+			logDebug("fDateMonth: "+fDateMonth+" fDateYear: "+fDateYear);
+		
+		if((oYear < fDateYear) || (oYear == fDateYear && oMonth < fDateMonth)){
+			monthLate = (fDateMonth - oMonth); logDebug("Months late: "+ monthLate);
+			yMonthLate = ((fDateYear - oYear)*12); logDebug("Years late: "+ yMonthLate);
+			monthsLate = monthLate+yMonthLate;
+		}
+		logDebug("Total months late: "+ monthsLate);
+		return monthsLate;
+	}
+}
 
+function calculateLicAppRenewPenaltyFee(){
+	var date1 = null;
+//	var date1 = new Date("12/01/2016");//testing
+	
+	if(appTypeArray[3] == "Application"){
+		var recType = "app";
+		var date1 = convertDate(AInfo["Business Open Date"]);
+		logDebug("Business Open Date: "+date1);
+	}
+	if(appTypeArray[3] == "Renewal"){
+		var recType = "rnew";
+		var parentLicenseCAPID = getParentLicenseCapID(capId);
+		if (parentLicenseCAPID != null){
+			var date1 = parentLicenseCAPID.getExpDate();
+			logDebug("License Expiration Date: "+date1);
+		}else{
+			logDebug("No parent license found");
+		}
+	}
+	if(date1){
+		var monthsLate = calcMonthsLate(date1);
+		var pPercent = 0;
+		var pAmount = 0;
+		if(monthsLate == 1) pPercent = 0.2;//20%
+		if(monthsLate == 2) pPercent = 0.3;//30%
+		if(monthsLate == 3) pPercent = 0.4;//40%
+		if(monthsLate > 3 && monthsLate < 13) pPercent = 0.5;//50%
+		if(monthsLate > 12 && monthsLate < 25) pPercent = 1.0;//100%
+		if(monthsLate > 24) pPercent = 1.5;//150%
+		logDebug("pPercent:" + pPercent);
+		if(pPercent > 0){
+			addFee("BLPN050","BL_PENALTY","FINAL",1,"N");//adds SG fee to get total fee amount to be penalized
+			var lFee = feeAmount("BLPN050", "NEW");
+			pAmount = lFee*pPercent;
+			removeFee("BLPN050", "FINAL");//removes SG fee after penalty amount is calculated
+			if(recType == "app"){
+				updateFee("BLPN060","BL_PENALTY","FINAL",pAmount,"N");
+			}
+			if(recType == "rnew"){
+				updateFee("BLPN060","BL_PENALTY","FINAL",pAmount,"N");
+			}
+		}
+	}
+	else logDebug("date1 was not set");
+}
 
+function daysBetween(date1, date2){
+	if (typeof(date1) == "object") date1 = date1.toString(); //Added these because we can't always assume it's a string, ASIT dates are objects.
+	if (typeof(date2) == "object") date2 = date2.toString(); //
+	if (date1.indexOf("-") != -1) { date1 = date1.split("-"); } else if (date1.indexOf("/") != -1) { date1 = date1.split("/"); } else { return 0; }
+	if (date2.indexOf("-") != -1) { date2 = date2.split("-"); } else if (date2.indexOf("/") != -1) { date2 = date2.split("/"); } else { return 0; }
+	if (parseInt(date1[0], 10) >= 1000) {
+		var sDate = new Date(date1[0]+"/"+date1[1]+"/"+date1[2]);
+	} else if (parseInt(date1[2], 10) >= 1000) {
+		var sDate = new Date(date1[2]+"/"+date1[0]+"/"+date1[1]); 
+	} else {
+		return 0;
+	}
+	if (parseInt(date2[0], 10) >= 1000) {
+		var eDate = new Date(date2[0]+"/"+date2[1]+"/"+date2[2]);
+	} else if (parseInt(date2[2], 10) >= 1000) {
+		var eDate = new Date(date2[2]+"/"+date2[0]+"/"+date2[1]);
+	} else {
+		return 0;
+	}
+	var one_day = 1000*60*60*24;
+	var daysApart = Math.abs(Math.ceil((sDate.getTime()-eDate.getTime())/one_day));
+	return daysApart;
+}
 
+function getParentLicenseCapID(capid) {
+	if (capid == null || aa.util.instanceOfString(capid)) { return null; }
+	var result = aa.cap.getProjectByChildCapID(capid, "Renewal", "Incomplete");
+	if(result.getSuccess() ) {
+		projectScriptModels = result.getOutput();
+		projectScriptModel = projectScriptModels[0];
+		return projectScriptModel.getProjectID();
+	} else {
+		return getParentCapVIAPartialCap(capid);
+	}
+}
 
+function updateLicense(){
+	try {
+		// get license capId
+		var licId = getParentLicenseCapID(capId);
+		
+		if (licId != null) {
+			// get license
+			var thisLic = new licenseObject(licIdString,licId); 
+			
+			// update expiration date
+			var prevExp = thisLic.getExpiration();	
+			thisLic.setExpiration(dateAddMonths(prevExp,12)) ;
+			
+			// update license record status to 'Issued'
+			updateAppStatus("Issued", "updated by script", licId);
+			
+			// update expiration status to 'Active'
+			thisLic.setStatus("Active");
+			
+			// update custom lists
+			copyASITables(capId, licId);
+		} else {
+			logDebug("Error: unable to get parent license record to update");
+		}
+	}
+	catch (err){
+		logDebug("Javascript error: " + err.message);
+	}
+}
 
-
-
-
-
-
-
-
+function feeTotalByStatus(feeStatus) {
+	var statusArray = new Array(); 
+	if (arguments.length > 0) {
+		for (var i=0; i<arguments.length; i++) statusArray.push(arguments[i]);
+	}
+	var feeTotal = 0;
+	var feeResult=aa.fee.getFeeItems(capId);
+	if (feeResult.getSuccess()) { 
+		var feeObjArr = feeResult.getOutput(); 
+		for (ff in feeObjArr) {
+			thisFeeStatus = "" + feeObjArr[ff].getFeeitemStatus();
+			if (exists(thisFeeStatus,statusArray)) feeTotal+=feeObjArr[ff].getFee();	
+		}
+	}
+	else { 
+		logDebug( "Error getting fee items: " + feeResult.getErrorMessage()); 
+	}
+	return feeTotal;
+}
