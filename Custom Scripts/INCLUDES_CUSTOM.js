@@ -1377,12 +1377,12 @@ function calculateLicAppRenewPenaltyFee(){
 	if(date1){
 		var monthsLate = calcMonthsLate(date1);
 		if(monthsLate > 0){
-			if(monthsLate == 1) updateFee("BLPN010","BL_PENALTY","FINAL",1,"N");
-			if(monthsLate == 2) updateFee("BLPN020","BL_PENALTY","FINAL",1,"N");
-			if(monthsLate == 3) updateFee("BLPN030","BL_PENALTY","FINAL",1,"N");
-			if(monthsLate > 3 && monthsLate < 13) updateFee("BLPN040","BL_PENALTY","FINAL",1,"N");
-			if(monthsLate > 12 && monthsLate < 25) updateFee("BLPN050","BL_PENALTY","FINAL",1,"N");
-			if(monthsLate > 24) updateFee("BLPN060","BL_PENALTY","FINAL",1,"N");
+			if(monthsLate == 1) updateFee("BLPN010","BL_PENALTY","FINAL",1,"Y");
+			if(monthsLate == 2) updateFee("BLPN020","BL_PENALTY","FINAL",1,"Y");
+			if(monthsLate == 3) updateFee("BLPN030","BL_PENALTY","FINAL",1,"Y");
+			if(monthsLate > 3 && monthsLate < 13) updateFee("BLPN040","BL_PENALTY","FINAL",1,"Y");
+			if(monthsLate > 12 && monthsLate < 25) updateFee("BLPN050","BL_PENALTY","FINAL",1,"Y");
+			if(monthsLate > 24) updateFee("BLPN060","BL_PENALTY","FINAL",1,"Y");
 		}
 		else logDebug("Not delinquint, no penalty added.");
 	}
