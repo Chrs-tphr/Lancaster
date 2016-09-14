@@ -10,11 +10,6 @@
 |         : createRefContactsFromCapContactsAndLink - testing new ability to link public users to new ref contacts
 /------------------------------------------------------------------------------------------------------*/
 
-//eval( aa.proxyInvoker.newInstance("com.accela.aa.emse.emse.EMSEBusiness").getOutput().getScriptByPK(aa.getServiceProviderCode(),"INCLUDES_CUSTOM_LIC","ADMIN").getScriptText() + "");
-
-//logDebug("----- Loading INCLUDES_CUSTOM");
-
-
 function createRefLicProf(rlpId,rlpType,pContactType)
 	{
 	//Creates/updates a reference licensed prof from a Contact
@@ -1366,15 +1361,11 @@ function calcMonthsLate(date1){//date1 is the ASI Business Open Date (Applicatio
 
 function calculateLicAppRenewPenaltyFee(){
 	var date1 = null;
-//	var date1 = new Date("12/01/2016");//testing
-	
 	if(appTypeArray[3] == "Application"){
-		var recType = "app";
 		var date1 = convertDate(AInfo["Business Open Date"]);
 		logDebug("Business Open Date: "+date1);
 	}
 	if(appTypeArray[3] == "Renewal"){
-		var recType = "rnew";
 		var parentLicenseCAPID = getParentLicenseCapID(capId);
 		if (parentLicenseCAPID != null){
 			var date1 = parentLicenseCAPID.getExpDate();
@@ -1385,27 +1376,15 @@ function calculateLicAppRenewPenaltyFee(){
 	}
 	if(date1){
 		var monthsLate = calcMonthsLate(date1);
-		var pPercent = 0;
-		var pAmount = 0;
-		if(monthsLate == 1) pPercent = 0.2;//20%
-		if(monthsLate == 2) pPercent = 0.3;//30%
-		if(monthsLate == 3) pPercent = 0.4;//40%
-		if(monthsLate > 3 && monthsLate < 13) pPercent = 0.5;//50%
-		if(monthsLate > 12 && monthsLate < 25) pPercent = 1.0;//100%
-		if(monthsLate > 24) pPercent = 1.5;//150%
-		logDebug("pPercent:" + pPercent);
-		if(pPercent > 0){
-			addFee("BLPN050","BL_PENALTY","FINAL",1,"N");//adds SG fee to get total fee amount to be penalized
-			var lFee = feeAmount("BLPN050", "NEW");
-			pAmount = lFee*pPercent;
-			removeFee("BLPN050", "FINAL");//removes SG fee after penalty amount is calculated
-			if(recType == "app"){
-				updateFee("BLPN060","BL_PENALTY","FINAL",pAmount,"N");
-			}
-			if(recType == "rnew"){
-				updateFee("BLPN060","BL_PENALTY","FINAL",pAmount,"N");
-			}
+		if(monthsLate > 0){
+			if(monthsLate == 1) updateFee("BLPN010","BL_PENALTY","FINAL",1,"N");
+			if(monthsLate == 2) updateFee("BLPN020","BL_PENALTY","FINAL",1,"N");
+			if(monthsLate == 3) updateFee("BLPN030","BL_PENALTY","FINAL",1,"N");
+			if(monthsLate > 3 && monthsLate < 13) updateFee("BLPN040","BL_PENALTY","FINAL",1,"N");
+			if(monthsLate > 12 && monthsLate < 25) updateFee("BLPN050","BL_PENALTY","FINAL",1,"N");
+			if(monthsLate > 24) updateFee("BLPN060","BL_PENALTY","FINAL",1,"N");
 		}
+		else logDebug("Not delinquint, no penalty added.");
 	}
 	else logDebug("date1 was not set");
 }
